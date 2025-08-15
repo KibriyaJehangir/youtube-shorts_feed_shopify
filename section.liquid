@@ -1,0 +1,120 @@
+<!-- youtube-shorts-horizontal.liquid -->
+<div class="shorts-container-horizontal">
+  {% assign video_ids = section.settings.videos | split: "," %}
+  {% for id in video_ids %}
+    <div class="short-video-wrapper-horizontal">
+      <iframe class="short-video-horizontal" 
+              src="https://www.youtube.com/embed/{{ id | strip }}?autoplay=0&mute=1&controls=0&loop=1&playlist={{ id | strip }}" 
+              frameborder="0" 
+              allow="autoplay; encrypted-media" 
+              allowfullscreen>
+      </iframe>
+      <!-- Overlay buttons -->
+      <div class="short-overlay-horizontal">
+        <button class="like-btn">💚</button>
+        <button class="share-btn">🔗</button>
+        <button class="shop-btn">🛒</button>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<style>
+.shorts-container-horizontal {
+  display: flex;
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory;
+  width: 100vw;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.short-video-wrapper-horizontal {
+  position: relative;
+  flex: 0 0 250px;
+  height: 450px;
+  margin-right: 15px;
+  scroll-snap-align: start;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.short-video-horizontal {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+}
+
+.short-overlay-horizontal {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.short-overlay-horizontal button {
+  background: rgba(0,0,0,0.5);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  cursor: pointer;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const iframes = document.querySelectorAll('.short-video-horizontal');
+
+  // Autoplay observer
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const iframe = entry.target;
+      const src = iframe.src;
+      if(entry.isIntersecting){
+        iframe.src = src.replace('autoplay=0','autoplay=1');
+      } else {
+        iframe.src = src.replace('autoplay=1','autoplay=0');
+      }
+    });
+  }, { threshold: 0.8 });
+
+  iframes.forEach(iframe => observer.observe(iframe));
+
+  // Heart emoji toggle
+  const heartButtons = document.querySelectorAll('.like-btn');
+  heartButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      if(this.textContent === '💚') {
+        this.textContent = '🖤';
+      } else {
+        this.textContent = '💚';
+      }
+    });
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Shorts Feed H",
+  "settings": [
+    {
+      "type": "text",
+      "id": "videos",
+      "label": "YouTube Video IDs (comma separated)",
+      "default": "dQw4w9WgXcQ,3JZ_D3ELwOQ"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shorts Feed H"
+    }
+  ]
+}
+{% endschema %}
